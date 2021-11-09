@@ -99,6 +99,12 @@ class ATM {
             return false;
     }
     
+    public static boolean checkMutiplesOf100or500(int amount){
+        if(amount%100 == 0 || amount%500 == 0)
+            return true;
+        else
+            return false;
+    }
 
     public static void main(String args[]) {
         Scanner scan = new Scanner(System.in);
@@ -156,13 +162,13 @@ class ATM {
         int enteredCardPin;
 
         if (simulation_status) { 
-            System.out.println("Please enter your Card Number");
+            System.out.print("Please enter your Card Number: ");
             enteredCardNumber = scan.nextInt();
 
             for (int i = 0; i < 3; i++) {
                 //verifying card number
                 if (verifyCardNumber(enteredCardNumber, card[i].getCarNumber())) {
-                    System.out.println("Please enter your Pin Number");
+                    System.out.print("Please enter your Pin Number: ");
                     enteredCardPin = scan.nextInt();
 
                     // since the card number is correct, checking corresponding pin number for same card
@@ -197,7 +203,7 @@ class ATM {
                     System.out.println("Enter 1 to continue with new card number or any other to exit simulator");
                     int choice = scan.nextInt();
                     if(choice == 1){
-                        System.out.println("Please re-enter a valid Card Number");
+                        System.out.print("Please re-enter a valid Card Number: ");
                         enteredCardNumber = scan.nextInt();
                         i = 0;
                     }
@@ -236,13 +242,21 @@ class ATM {
 
                 // denomination of 100 and 500 only
                 case 1:
-                    System.out.println("Please enter an amount to be withdrawn");
+                    System.out.println("Please enter an amount to be withdrawn in multiples of 100 or 500 only");
                     amount = scan.nextInt();
+                    while(checkMutiplesOf100or500(amount) != true){
+                        System.out.println("Please enter an amount to be withdrawn in multiples of 100 or 500 only");
+                        amount = scan.nextInt();
+                    }
 
                     while (machine_balance < amount) {
                         System.out.println("Machine doesn't have sufficient cash to be withdrawn");
                         System.out.println("Please enter a value, less than " + machine_balance);
                         amount = scan.nextInt();
+                        while(checkMutiplesOf100or500(amount) != true){
+                            System.out.println("Please enter an amount to be withdrawn in multiples of 100 or 500 only");
+                            amount = scan.nextInt();
+                        }
                     }
 
                     if(account[currentUser].withdraw(amount)){
