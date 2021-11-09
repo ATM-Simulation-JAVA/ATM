@@ -2,12 +2,16 @@ import java.io.*;
 import java.util.*;
 
 class User {
-    int account_balance;
+    private int account_balance;
+
+    public int setAccountBalance(int max, int min){
+        return (int) Math.floor(Math.random() * (max - min + 1) + min); 
+    }
 
     User() {
         // Math.floor(Math.random()*(max-min+1)+min)
         // Minimum balance = 1000, Maximum = 10000
-        account_balance = (int) Math.floor(Math.random() * (10000 - 1000 + 1) + 1000);
+        account_balance =  setAccountBalance(10000, 1000);
     }
 
     class Account {
@@ -25,7 +29,7 @@ class User {
         }
         // displaying current account balance
         public void display_balance() {
-            System.out.println("Your current account balance is " + account_balance);
+            System.out.println("Current account balance: " + account_balance);
         }
         // depositing amount to account balance
         public void deposit(int amount) {
@@ -35,43 +39,74 @@ class User {
     }
 
     class Card {
-        int card_number;
-        int card_pin;
+        private int card_number;
+        private int card_pin;
+
+        public int setCardCredentials(int max, int min){
+            return (int) Math.floor(Math.random() * (max - min + 1) + min); 
+        }
 
         Card() {
             // 5 digit card number
-            card_number = (int) Math.floor(Math.random() * (99999 - 10000 + 1) + 10000);
+            card_number = setCardCredentials(99999, 10000);
             // 3 digit card pin
-            card_pin = (int) Math.floor(Math.random() * (999 - 100 + 1) + 100);
+            card_pin = setCardCredentials(999, 100);
         }
 
-        public boolean verifyCardNumber(int cardNumber) {
-            if (card_number == cardNumber) {
-                return true;
-            } else {
-                return false;
-            }
+        public int getCarNumber() {
+            return card_number;
         }
-        public boolean verifyCardPin(int pinNumber) {
-            if (card_pin == pinNumber) {
-                return true;
-            } else {
-                return false;
-            }
+        public int getCardPin() {
+            return card_pin;
         }
+        public boolean updatePin(int enteredCardNumber, int enteredCardPin, int newCardPin){
+            if(enteredCardNumber == card_number && enteredCardPin == card_pin){
+                card_pin = newCardPin;
+                return true;
+            }
+            else
+                return false;      
+        }
+        
     }
 }
 
 
 class ATM {
+
+    private static boolean verifyAdmin(String code) {
+        if(code.equalsIgnoreCase("admin"))
+            return true;
+        else
+            return false;
+    }
+
+    private static int setMachineBalance(int max, int min){
+        return (int) Math.floor(Math.random() * (max - min + 1) + min); 
+    }
+
+    public static boolean verifyCardNumber(int enteredCardNumber, int cardNumber){
+        if(enteredCardNumber == cardNumber) 
+            return true;
+        else 
+            return false;
+    }
+    
+    public static boolean verifyCardPin(int enteredCardPin, int cardPin){
+        if(enteredCardPin == cardPin) 
+            return true;
+        else 
+            return false;
+    }
+    
+
     public static void main(String args[]) {
         Scanner scan = new Scanner(System.in);
 
-        // syntax to create an array of objects and link it to the internal classes simultaneously
-        // automating class generation and one to one mapping
-        // to replace HARDCODED logic
-
-        int data_base_size = 3;
+        
+        //since ATM can't generate new users and only works with the existing ones
+        //generating a database with random values of PIN NUMBER and BALANCE
+        final int data_base_size = 3;
 
         User[] user = new User[data_base_size];
         User.Account[] account = new User.Account[data_base_size];
@@ -82,68 +117,74 @@ class ATM {
             card[i] = user[i].new Card();
         }
 
-        int machine_balance = (int) Math.floor(Math.random() * (100000 - 0 + 1) + 0);
-
+        int machine_balance = setMachineBalance(100000, 0);
 
         System.out.println("Type 'start' to start the simulation");
-        String start = scan.next();
+        String helperString = scan.next();
         boolean simulation_status = false;
 
         // ! DON'T IGNORE !
-        // *SMALL AUTHENTICATION SYSTEM, IN ORDER TO KNOW THE DETAILS, TYPE 'admin' *
+        // *SMALL AUTHENTICATION SYSTEM, IN ORDER TO KNOW THE DETAILS, TYPE 'admin' (not case sensitive)*
 
         while (!simulation_status) {
-            if (start.equalsIgnoreCase("start")) {
+            if (helperString.equalsIgnoreCase("start")) {
                 System.out.println("Welcome to ATM Simulation");
                 simulation_status = true;
-            } else if (start.equalsIgnoreCase("admin")) {
+            } else if (verifyAdmin(helperString)) {
                 for (int i = 0; i < 3; i++) {
                     System.out.println("User" + (i + 1) + " account details:");
-                    System.out.println("Account Balance: " + user[i].account_balance);
-                    System.out.println("Card Number: " + card[i].card_number);
-                    System.out.println("Pin Number: " + card[i].card_pin);
+                    account[i].display_balance();
+                    
+                    System.out.println("Card Number: " + card[i].getCarNumber());
+                    System.out.println("Card Pin: " + card[i].getCardPin());
                     System.out.println("");
                 }
-                System.out.println("Machine Balance: " + machine_balance);
+                System.out.println("Machine starting Balance: " + machine_balance);
                 System.out.println("");
                 System.out.println("Welcome to ATM Simulation");
                 simulation_status = true;
             }
+            else {
+                System.out.println("Try typing again buddy!");
+                helperString = scan.next();
+            }
         }
 
         // verification system starts
-        int userNumber = -1;
-        if (simulation_status) {
-            
+        int currentUser = -1;
+        int enteredCardNumber;
+        int enteredCardPin;
+
+        if (simulation_status) { 
             System.out.println("Please enter your Card Number");
-            int cardNumber = scan.nextInt();
+            enteredCardNumber = scan.nextInt();
 
             for (int i = 0; i < 3; i++) {
                 //verifying card number
-                if (card[i].verifyCardNumber(cardNumber)) {
+                if (verifyCardNumber(enteredCardNumber, card[i].getCarNumber())) {
                     System.out.println("Please enter your Pin Number");
-                    int pinNumber = scan.nextInt();
+                    enteredCardPin = scan.nextInt();
 
                     // since the card number is correct, checking corresponding pin number for same card
-                    if (card[i].verifyCardPin(pinNumber)) {
-                        userNumber = i;
+                    if (verifyCardPin(enteredCardPin, card[i].getCardPin())) {
+                        currentUser = i;
                         System.out.println("User" + (i + 1) + " verified, Welcome!");
                         // saving the index of user perfectly identified
                         break;
                     }
                     // if the corresponding pin is wrong
                     else {
-                        while (!card[i].verifyCardPin(pinNumber)) {
-                            System.out.println("Please re-enter a valid Pin Number or 0 to Quit Simulation");
-                            pinNumber = scan.nextInt();
-                            if (pinNumber == 0) {
+                        while (!verifyCardPin(enteredCardPin, card[i].getCardPin())) {
+                            System.out.println("Please re-enter a valid Pin Number or -1 to Quit Simulation");
+                            enteredCardPin = scan.nextInt();
+                            if (enteredCardPin == -1) {
                                 simulation_status = false;
                                 System.out.println("Thank You! Have a nice day.");
                                 System.exit(0);
                             }
                         }
-                        if (card[i].verifyCardPin(pinNumber)) {
-                            userNumber = i;
+                        if (verifyCardPin(enteredCardPin, card[i].getCardPin())) {
+                            currentUser = i;
                             System.out.println("User" + (i + 1) + " verified, Welcome!");
                             // saving the index of user perfectly identified
                             break;
@@ -152,12 +193,12 @@ class ATM {
                 }
                 // if the card number is false
                 else if(i == data_base_size - 1){
-                    System.out.println("There is no such user with card number: " + cardNumber + " in the data base.");
+                    System.out.println("There is no such user with card number: " + enteredCardNumber + " in the data base.");
                     System.out.println("Enter 1 to continue with new card number or any other to exit simulator");
                     int choice = scan.nextInt();
                     if(choice == 1){
                         System.out.println("Please re-enter a valid Card Number");
-                        cardNumber = scan.nextInt();
+                        enteredCardNumber = scan.nextInt();
                         i = 0;
                     }
                     else {
@@ -168,7 +209,7 @@ class ATM {
                 }
             }
             // in case of unexpected error which even I don't know
-            if (userNumber == -1) {
+            if (currentUser == -1) {
                 System.out.println("Unexpected Error!");
                 simulation_status = false;
                 System.exit(0);
@@ -181,6 +222,7 @@ class ATM {
             System.out.println("1 = Cash Withdraw");
             System.out.println("2 = Cash Deposit");
             System.out.println("3 = View Balance");
+            System.out.println("4 = Change Pin");
 
             int choice = scan.nextInt();
             int amount;
@@ -192,6 +234,7 @@ class ATM {
                     System.exit(0);
                     break;
 
+                // denomination of 100 and 500 only
                 case 1:
                     System.out.println("Please enter an amount to be withdrawn");
                     amount = scan.nextInt();
@@ -202,7 +245,7 @@ class ATM {
                         amount = scan.nextInt();
                     }
 
-                    if(account[userNumber].withdraw(amount)){
+                    if(account[currentUser].withdraw(amount)){
                         machine_balance = machine_balance - amount;
                     }
                     break;
@@ -211,14 +254,31 @@ class ATM {
                     System.out.println("Please enter an amount to deposit");
                     amount = scan.nextInt();
 
-                    account[userNumber].deposit(amount);
+                    account[currentUser].deposit(amount);
 
                     machine_balance = machine_balance + amount;
                     break;
 
                 case 3:
-                    account[userNumber].display_balance();
+                    account[currentUser].display_balance();
                     break;
+
+                case 4:
+                    System.out.println("For double verification");
+                    System.out.print("Enter current card number: ");
+                    enteredCardNumber = scan.nextInt();
+                    System.out.print("Enter current card pin: ");
+                    enteredCardPin = scan.nextInt();
+                    System.out.print("Enter new card pin: ");
+                    int newCardPin = scan.nextInt();
+                    System.out.println("");
+
+                    if(card[currentUser].updatePin(enteredCardNumber, enteredCardPin, newCardPin)){
+                        System.out.println("Successfully Updated");
+                    }
+                    else{
+                        System.out.print("Error");
+                    }
 
                 default:
                     System.out.println("Please enter a valid choice!");
