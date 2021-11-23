@@ -1,8 +1,11 @@
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 class User {
     private int account_balance;
+
+    
 
     public int setAccountBalance(int max, int min){
         return (int) Math.floor(Math.random() * (max - min + 1) + min); 
@@ -15,11 +18,11 @@ class User {
     }
 
     class Account {
+        
         // withdrawing amount from account balance
         public boolean withdraw(int amount) {
             if (account_balance >= amount) {
-                account_balance = account_balance - amount;
-                System.out.println("Your withdrawl of amount " + amount + " was succesful!");
+                account_balance = account_balance - amount; 
                 return true;
             } else {
                 System.out.println("Your current balance is lower than the amount to be withdrawn!");
@@ -29,12 +32,12 @@ class User {
         }
         // displaying current account balance
         public void display_balance() {
-            System.out.println("Current account balance: " + account_balance);
+            System.out.println("Current account balance: " + account_balance +"\n");
         }
         // depositing amount to account balance
         public void deposit(int amount) {
             account_balance = account_balance + amount;
-            System.out.println("Your deposit of amount " + amount + " was succesful!");
+            
         }
     }
 
@@ -106,9 +109,16 @@ class ATM {
             return false;
     }
 
-    public static void main(String args[]) {
-        Scanner scan = new Scanner(System.in);
+    public static void printWithDelays(String data, TimeUnit unit, long delay) throws InterruptedException {
+        for (char ch:data.toCharArray()) {
+            System.out.print(ch);
+            unit.sleep(delay);
+        }
+    }
 
+    public static void main(String[] args) throws Exception {
+        Scanner scan = new Scanner(System.in);
+        Date date = java.util.Calendar.getInstance().getTime();  
         
         //since ATM can't generate new users and only works with the existing ones
         //generating a database with random values of PIN NUMBER and BALANCE
@@ -125,7 +135,7 @@ class ATM {
 
         int machine_balance = setMachineBalance(100000, 0);
 
-        System.out.println("Type 'start' to start the simulation");
+        System.out.println("\nType 'start' to start the simulation");
         String helperString = scan.next();
         boolean simulation_status = false;
 
@@ -134,24 +144,27 @@ class ATM {
 
         while (!simulation_status) {
             if (helperString.equalsIgnoreCase("start")) {
-                System.out.println("Welcome to ATM Simulation");
+                printWithDelays("Welcome to ATM Simulation    \n", TimeUnit.MILLISECONDS, 100);
                 simulation_status = true;
             } else if (verifyAdmin(helperString)) {
+                System.out.print("\nFetching Userbase Data");
+                printWithDelays("....\n", TimeUnit.MILLISECONDS, 800);
+                System.out.println("");
                 for (int i = 0; i < 3; i++) {
                     System.out.println("User" + (i + 1) + " account details:");
                     account[i].display_balance();
                     
                     System.out.println("Card Number: " + card[i].getCarNumber());
                     System.out.println("Card Pin: " + card[i].getCardPin());
-                    System.out.println("");
+                    printWithDelays("\n", TimeUnit.MILLISECONDS, 1000);
                 }
                 System.out.println("Machine starting Balance: " + machine_balance);
                 System.out.println("");
-                System.out.println("Welcome to ATM Simulation");
+                printWithDelays("Welcome to ATM Simulation    \n", TimeUnit.MILLISECONDS, 100);
                 simulation_status = true;
             }
             else {
-                System.out.println("Try typing again buddy!");
+                System.out.println("Try typing again buddy!\n");
                 helperString = scan.next();
             }
         }
@@ -174,24 +187,30 @@ class ATM {
                     // since the card number is correct, checking corresponding pin number for same card
                     if (verifyCardPin(enteredCardPin, card[i].getCardPin())) {
                         currentUser = i;
-                        System.out.println("User" + (i + 1) + " verified, Welcome!");
+                        System.out.print("\nVerifying Credentials");
+                        printWithDelays("...\n", TimeUnit.MILLISECONDS, 800);
+                        System.out.println("\nUser" + (i + 1) + " verified, Welcome!");
                         // saving the index of user perfectly identified
                         break;
                     }
                     // if the corresponding pin is wrong
                     else {
                         while (!verifyCardPin(enteredCardPin, card[i].getCardPin())) {
-                            System.out.println("Please re-enter a valid Pin Number or -1 to Quit Simulation");
+                            System.out.println("\nPlease re-enter a valid Pin Number or -1 to Quit Simulation");
                             enteredCardPin = scan.nextInt();
                             if (enteredCardPin == -1) {
                                 simulation_status = false;
+                                System.out.print("\nEnding Session");
+                                printWithDelays(" ", TimeUnit.MILLISECONDS, 800);
                                 System.out.println("Thank You! Have a nice day.");
                                 System.exit(0);
                             }
                         }
                         if (verifyCardPin(enteredCardPin, card[i].getCardPin())) {
                             currentUser = i;
-                            System.out.println("User" + (i + 1) + " verified, Welcome!");
+                            System.out.print("\nVerifying Credentials");
+                            printWithDelays("...\n", TimeUnit.MILLISECONDS, 800);
+                            System.out.println("\nUser" + (i + 1) + " verified, Welcome!");
                             // saving the index of user perfectly identified
                             break;
                         }
@@ -199,16 +218,18 @@ class ATM {
                 }
                 // if the card number is false
                 else if(i == data_base_size - 1){
-                    System.out.println("There is no such user with card number: " + enteredCardNumber + " in the data base.");
+                    System.out.println("\nThere is no such user with card number '" + enteredCardNumber + "' in the data base.");
                     System.out.println("Enter 1 to continue with new card number or any other to exit simulator");
                     int choice = scan.nextInt();
                     if(choice == 1){
-                        System.out.print("Please re-enter a valid Card Number: ");
+                        System.out.print("\nPlease re-enter a valid Card Number: ");
                         enteredCardNumber = scan.nextInt();
                         i = 0;
                     }
                     else {
                         simulation_status = false;
+                        System.out.print("\nEnding Session");
+                        printWithDelays(" ", TimeUnit.MILLISECONDS, 800);
                         System.out.println("Thank You! Have a nice day.");
                         System.exit(0);
                     }
@@ -228,7 +249,7 @@ class ATM {
             System.out.println("1 = Cash Withdraw");
             System.out.println("2 = Cash Deposit");
             System.out.println("3 = View Balance");
-            System.out.println("4 = Change Pin");
+            System.out.println("4 = Change Pin\n");
 
             int choice = scan.nextInt();
             int amount;
@@ -236,6 +257,8 @@ class ATM {
             switch (choice) {
                 case 0:
                     simulation_status = false;
+                    System.out.print("\nEnding Session");
+                    printWithDelays("..\n", TimeUnit.MILLISECONDS, 800);
                     System.out.println("Thank You! Have a nice day.");
                     System.exit(0);
                     break;
@@ -260,6 +283,12 @@ class ATM {
                     }
 
                     if(account[currentUser].withdraw(amount)){
+                        System.out.print("\nTypical Machine Sounds");
+                        printWithDelays("...\n", TimeUnit.MILLISECONDS, 1000);
+                        
+                        System.out.println("Receipt");  
+                        System.out.println(date);  
+                        System.out.println("Your withdrawl of amount " + amount + " was successful!\n");
                         machine_balance = machine_balance - amount;
                     }
                     break;
@@ -267,18 +296,29 @@ class ATM {
                 case 2:
                     System.out.println("Please enter an amount to deposit");
                     amount = scan.nextInt();
-
+                    while(checkMutiplesOf100or500(amount) != true){
+                        System.out.println("Please enter an amount to be withdrawn in multiples of 100 or 500 only");
+                        amount = scan.nextInt();
+                    }
+                    printWithDelays(" ", TimeUnit.MILLISECONDS, 1000);
                     account[currentUser].deposit(amount);
+
+                    System.out.println("\nReceipt");  
+                    System.out.println(date);
+                    System.out.println("Your deposit of amount " + amount + " was succesful!\n");
 
                     machine_balance = machine_balance + amount;
                     break;
 
                 case 3:
+                    System.out.print("\nFetching User Balance");
+                    printWithDelays("...\n", TimeUnit.MILLISECONDS, 800);
+                    System.out.println(date);
                     account[currentUser].display_balance();
                     break;
 
                 case 4:
-                    System.out.println("For double verification");
+                    System.out.println("\nFor double verification");
                     System.out.print("Enter current card number: ");
                     enteredCardNumber = scan.nextInt();
                     System.out.print("Enter current card pin: ");
@@ -288,11 +328,15 @@ class ATM {
                     System.out.println("");
 
                     if(card[currentUser].updatePin(enteredCardNumber, enteredCardPin, newCardPin)){
-                        System.out.println("Successfully Updated");
+                        System.out.print("\nUpdating User Database");
+                        printWithDelays("...", TimeUnit.MILLISECONDS, 1000);                        
+                        printWithDelays("\nIntentional delay to imply its important process", TimeUnit.MILLISECONDS, 800);
+                        System.out.println("\nSuccessfully Updated");
                     }
                     else{
                         System.out.print("Error");
                     }
+                    break;
 
                 default:
                     System.out.println("Please enter a valid choice!");
