@@ -32,7 +32,7 @@ class User {
         }
         // displaying current account balance
         public void display_balance() {
-            System.out.println("Current account balance: " + account_balance +"\n");
+            System.out.println("Current account balance: " + account_balance);
         }
         // depositing amount to account balance
         public void deposit(int amount) {
@@ -114,6 +114,13 @@ class ATM {
             System.out.print(ch);
             unit.sleep(delay);
         }
+    }
+
+    public static boolean checkNewPin(int newCardPin){
+        if(newCardPin > 99 && newCardPin < 1000)
+            return true;
+        else
+            return false;
     }
 
     public static void main(String[] args) throws Exception {
@@ -315,26 +322,38 @@ class ATM {
                     printWithDelays("...\n", TimeUnit.MILLISECONDS, 800);
                     System.out.println(date);
                     account[currentUser].display_balance();
+                    System.out.println("");
                     break;
 
                 case 4:
-                    System.out.println("\nFor double verification");
+                    System.out.println("\nFor double verification, entering wrong credentials will result in error.");
                     System.out.print("Enter current card number: ");
                     enteredCardNumber = scan.nextInt();
                     System.out.print("Enter current card pin: ");
                     enteredCardPin = scan.nextInt();
                     System.out.print("Enter new card pin: ");
                     int newCardPin = scan.nextInt();
+
+                    while(!checkNewPin(newCardPin)){
+                        System.out.print("Enter 3 digit card pin: ");
+                        newCardPin = scan.nextInt();
+                    }
+                    while(enteredCardPin == newCardPin){
+                        System.out.print("Enter new card pin: ");
+                        newCardPin = scan.nextInt();
+                    }
+
                     System.out.println("");
 
                     if(card[currentUser].updatePin(enteredCardNumber, enteredCardPin, newCardPin)){
                         System.out.print("\nUpdating User Database");
                         printWithDelays("...", TimeUnit.MILLISECONDS, 1000);                        
-                        printWithDelays("\nIntentional delay to imply its important process", TimeUnit.MILLISECONDS, 800);
-                        System.out.println("\nSuccessfully Updated");
+                        printWithDelays("\nIntentional delay to imply its important process    ", TimeUnit.MILLISECONDS, 100);
+                        System.out.println("\nSuccessfully Updated\n");
                     }
                     else{
-                        System.out.print("Error");
+                        printWithDelays("", TimeUnit.MILLISECONDS, 1000);
+                        System.out.print("Error, please try again\n");
                     }
                     break;
 
