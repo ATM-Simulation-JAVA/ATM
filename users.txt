@@ -1,0 +1,16 @@
+Thu Nov 25 15:51:45 IST 2021
+User:1
+Account Balance: 4887
+Card Number: 45896
+Card Pin: 989
+
+User:2
+Account Balance: 5339
+Card Number: 16195
+Card Pin: 207
+
+User:3
+Account Balance: 9957
+Card Number: 92050
+Card Pin: 310
+
